@@ -18,6 +18,8 @@ Parameter:
     Type: String
   CertificateArn:
     Type: String
+  AppName:
+    Type: String
 
 Resources:
 #############################
@@ -53,6 +55,44 @@ Resources:
       Port: !Ref ListenerContainerPort
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-Ext-2018-06
+  
+  TargetGroupAlb:
+    Type: AWS::ElasticLoadBalancerV2::TargetGroup
+    Properties:
+      Port: !Ref ListenerContainerPort
+      Protocol: HTTP
+      TargetGroupAttributes:
+      - Key: desregistration_delay.timeout_seconds
+        Value: '5'
+      UnhealthyThresholdCount: 3
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /actuator/health
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyCheckCount: 5
+      VpcId: !Ref VPCID
+      TargetType: ip
+      Tags:
+      - Key: Port
+        Value: !Ref ListenerContainerPort
+      - Key: TGName
+        Value: !Sub "tg-alb-${AppName}"
+
+  ListenerAlbAppName:
+    Type: AWS::ElasticLoadBalancerV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroupAlb
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+            - "/app_path/*"
+      ListenerArn: !ImportValue
+        'Fn::Sub': 'Stack-Infra-${ProjectName}-${MicroServiceName}-ArnListenerAlb'
+      Priority: 3
+
 
 ###############################
 # LogGroup MetricFilter Alarm #
