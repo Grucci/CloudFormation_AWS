@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameter:
+  FeatureName:
+    Type: String
+  MicroServiceName:
+    Type: String
+  ListenerContainerPort:
+    Type: String
+  CertificationArn:
+    Type: String
+  PrivateSubnetA:
+    Type: String
+  PrivateSubnetB:
+    Type: String
+  LoadBalancerName:
+    Type: String
+  SecurityGroup:
+    Type: String
+  CertificateArn:
+    Type: String
+
+Resources:
+#############################
+# LoadBalancer and Listener #
+#############################
+  LoadBalancerALB:
+    Type: AWS::ElasticLoadBalancerV2::LoadBalancer
+    Properties:
+      Name: !Ref LoadBalancerName
+      Type: application
+      Scheme: internal
+      Subnets:
+      - Ref: PrivateSubnetOne
+      - Ref: PrivateSubnetTwo
+      SecurityGroup:
+        - Ref: SecurityGroup
+      Tags:
+      - Key: 
+        Value:
+
+  ListenerALB:
+    Type: AWS::ElasticLoadBalancerV2::Listener
+    Properties:
+      Certificates:
+      - CertificationArn: !Ref CertificateArn
+      DefaultActions
+      - Type: fixed-response
