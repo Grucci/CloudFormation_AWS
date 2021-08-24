@@ -55,7 +55,10 @@ Resources:
       Port: !Ref ListenerContainerPort
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-Ext-2018-06
-  
+
+################################################################################
+# Usado junto da aplicação - TargetGroup e amarração do TG e ALB pelo Listener #
+################################################################################
   TargetGroupAlb:
     Type: AWS::ElasticLoadBalancerV2::TargetGroup
     Properties:
