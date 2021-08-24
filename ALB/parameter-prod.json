@@ -1,0 +1,13 @@
+{
+    "Parameter": { 
+        "ProjectName": "",
+        "MicroServiceName": "",
+        "ListenerContainerPort": "",
+        "CertificationArn": "",
+        "PrivateSubnetA": "",
+        "PrivateSubnetB": "",
+        "LoadBalancerName": "",
+        "SecurityGroup": "",
+        "CertificateArn": ""
+    }
+}
