@@ -2,7 +2,6 @@
     "Parameter": { 
         "ProjectName": "",
         "MicroServiceName": "",
-        "AliasName": "",
-        "KMSType": ""
+        "ECSServiceName": ""
     }
 }

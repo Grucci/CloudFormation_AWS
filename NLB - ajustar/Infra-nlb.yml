@@ -4,97 +4,61 @@ Parameter:
     Type: String
   MicroServiceName:
     Type: String
-  ListenerContainerPort:
-    Type: String
-  CertificationArn:
-    Type: String
-  PrivateSubnetA:
-    Type: String
-  PrivateSubnetB:
-    Type: String
-  LoadBalancerName:
-    Type: String
-  SecurityGroup:
-    Type: String
-  CertificateArn:
-    Type: String
   AppName:
     Type: String
+  PrivateSubnetOne:
+    Type: String
+  PrivateSubnetTwo:
+    Type: String
+  ExportPortinDockerfile:
+    Type: String
+  ListenerPort:
+    Type: String
+  
 
 Resources:
-#############################
-# LoadBalancer and Listener #
-#############################
-  LoadBalancerALB:
+####################
+# LoadBalancer NLB #
+####################
+  LoadBalancerNLBAppName:
     Type: AWS::ElasticLoadBalancerV2::LoadBalancer
     Properties:
-      Name: !Ref LoadBalancerName
-      Type: application
+      Name: !Sub "nlb-${AppName}"
+      Type: network
       Scheme: internal
       Subnets:
       - Ref: PrivateSubnetOne
       - Ref: PrivateSubnetTwo
-      SecurityGroup:
-        - Ref: SecurityGroup
       Tags:
       - Key: 
         Value:
 
-  ListenerALB:
-    Type: AWS::ElasticLoadBalancerV2::Listener
-    Properties:
-      Certificates:
-      - CertificationArn: !Ref CertificateArn
-      DefaultActions:
-      - Type: fixed-response
-        FixedResponseConfig:
-          ContentType: "application/json"
-          MenssageBody: "{ \"alb\": \"rota default\" }"
-          StatusCode: "403"
-      LoadBalancerArn: !Ref LoadBalancerALB
-      Port: !Ref ListenerContainerPort
-      Protocol: HTTPS
-      SslPolicy: ELBSecurityPolicy-TLS-1-2-Ext-2018-06
-
 ################################################################################
-# Usado junto da aplicação - TargetGroup e amarração do TG e ALB pelo Listener #
+# Usado junto da aplicação - TargetGroup e amarração do TG e NLB pelo Listener #
 ################################################################################
-  TargetGroupAlb:
+  TargetGroupNlbAppName:
     Type: AWS::ElasticLoadBalancerV2::TargetGroup
     Properties:
-      Port: !Ref ListenerContainerPort
-      Protocol: HTTP
+      Port: !Ref ExportPortinDockerfile
+      Protocol: TCP
+      TagetType: ip
       TargetGroupAttributes:
       - Key: desregistration_delay.timeout_seconds
         Value: '5'
-      UnhealthyThresholdCount: 3
-      HealthCheckIntervalSeconds: 30
-      HealthCheckPath: /actuator/health
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 5
-      HealthyCheckCount: 5
-      VpcId: !Ref VPCID
-      TargetType: ip
       Tags:
-      - Key: Port
-        Value: !Ref ListenerContainerPort
-      - Key: TGName
-        Value: !Sub "tg-alb-${AppName}"
+      - Key: TG Name
+        Value: !Sub "tg-${AppName}"
 
-  ListenerAlbAppName:
-    Type: AWS::ElasticLoadBalancerV2::ListenerRule
+  ListenerNlbAppName:
+    Type: AWS::ElasticLoadBalancerV2::Listener
     Properties:
-      Actions:
+      DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref TargetGroupAlb
-      Conditions:
-        - Field: path-pattern
-          PathPatternConfig:
-            Values:
-            - "/app_path/*"
-      ListenerArn: !ImportValue
-        'Fn::Sub': 'Stack-Infra-${ProjectName}-${MicroServiceName}-ArnListenerAlb'
-      Priority: 3
+          TargetGroupArn: !Ref TargetGroupNlb
+      LoadBalancerArn: !ImportValue
+        'Fn::Sub': 'Stack-Infra-${ProjectName}-${MicroServiceName}-ArnNLBAppName'
+      Port: !Ref ListenerPort
+      Protocol: TCP
 
 
 ###############################
@@ -140,8 +104,8 @@ Resources:
 # Outputs #
 ###########
 Outputs:
-  ListenerALB:
-    Description: ARN do Listener do ALB
-    Value: !Ref ListenerALB
+  TGAppName:
+    Description: ARN do LoadBalancer
+    Value: !Ref LoadBalancerNLB
     Export:
-      Name: !Sub "${AWS::StackName-ArnListenerAlb}"
+      Name: !Sub "${AWS::StackName-ArnNLBAppName}"
