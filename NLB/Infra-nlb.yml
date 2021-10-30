@@ -33,9 +33,9 @@ Resources:
       - Key: 
         Value:
 
-################################################################################
-# Usado junto da aplicação - TargetGroup e amarração do TG e NLB pelo Listener #
-################################################################################
+###################################################################################################
+# Pode ser criado junto da infra do container - TargetGroup e amarração do TG e ALB pelo Listener #
+###################################################################################################
   TargetGroupNlbAppName:
     Type: AWS::ElasticLoadBalancerV2::TargetGroup
     Properties:
