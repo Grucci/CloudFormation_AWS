@@ -20,7 +20,7 @@ Parameter:
     Type: String
   AppName:
     Type: String
-########coloquei uma nova tag
+
 Resources:
 #############################
 # LoadBalancer and Listener #
