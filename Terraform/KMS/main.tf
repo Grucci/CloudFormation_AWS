@@ -5,12 +5,12 @@ local {
 }
 
 resource "aws_kms_key" "KMS_key" {
-    description = ""
+    description             = ""
     deletion_window_in_days = 10
-    enable_key_rotation = var.enable_key_rotation
+    enable_key_rotation     = var.enable_key_rotation
     tags = {
         environment = var.environment
-        kms_type = var.kms_type
+        kms_type    = var.kms_type
     }
     policy = <<EOT
     {
@@ -44,6 +44,6 @@ resource "aws_kms_key" "KMS_key" {
 }
 
 resource "aws_kms_alias" "kms_alias" {
-  name = "alias/${var.key_name}"
+  name          = "alias/${var.key_name}"
   target_key_id = aws_kms_key.KMS_key.key_id
 }
