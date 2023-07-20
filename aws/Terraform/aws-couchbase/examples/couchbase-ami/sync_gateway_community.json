@@ -1,0 +1,27 @@
+{
+  "adminInterface": "<ADMIN_INTERFACE>",
+  "interface": "<INTERFACE>",
+  "databases": {
+    "<DB_NAME>": {
+      "server": "<SERVERS>",
+      "username": "<DB_USERNAME>",
+      "password": "<DB_PASSWORD>",
+      "bucket": "<BUCKET_NAME>",
+      "num_index_replicas": 0,
+      "users": {"GUEST": {"disabled": false, "admin_channels": ["*"]}}
+    }
+  },
+  "logging": {
+    "default": {
+      "logFilePath": "/home/sync_gateway/logs/sync-gateway.log",
+      "logKeys": ["*"],
+      "logLevel": "info",
+      "rotation": {
+        "maxsize": 100,
+        "maxage": 30,
+        "maxbackups": 5,
+        "localtime": true
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "Parameter": { 
+        "ProjectName": "",
+        "MicroServiceName": "",
+        "AppName": "",
+        "PrivateSubnetOne": "",
+        "PrivateSubnetTwo": ""
+    }
+}
