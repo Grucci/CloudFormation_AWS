@@ -1,0 +1,110 @@
+defaults: &defaults
+  machine: true
+  environment:
+    GRUNTWORK_INSTALLER_VERSION: v0.0.30
+    TERRATEST_LOG_PARSER_VERSION: v0.30.10
+    MODULE_CI_VERSION: v0.29.0
+    TERRAFORM_VERSION: 0.13.4
+    TERRAGRUNT_VERSION: NONE
+    PACKER_VERSION: 1.6.1
+    GOLANG_VERSION: 1.14
+
+install_gruntwork_utils: &install_gruntwork_utils
+  name: install gruntwork utils
+  command: |
+    curl -Ls https://raw.githubusercontent.com/gruntwork-io/gruntwork-installer/master/bootstrap-gruntwork-installer.sh | bash /dev/stdin --version "${GRUNTWORK_INSTALLER_VERSION}"
+    gruntwork-install --module-name "gruntwork-module-circleci-helpers" --repo "https://github.com/gruntwork-io/module-ci" --tag "${MODULE_CI_VERSION}"
+    gruntwork-install --binary-name "terratest_log_parser" --repo "https://github.com/gruntwork-io/terratest" --tag "${TERRATEST_LOG_PARSER_VERSION}"
+    configure-environment-for-gruntwork-module \
+      --terraform-version ${TERRAFORM_VERSION} \
+      --terragrunt-version ${TERRAGRUNT_VERSION} \
+      --packer-version ${PACKER_VERSION} \
+      --go-version ${GOLANG_VERSION}
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      # Install gruntwork utilities
+      - run:
+          <<: *install_gruntwork_utils
+
+      # Fail the build if the pre-commit hooks don't pass. Note: if you run pre-commit install locally, these hooks will
+      # execute automatically every time before you commit, ensuring the build never fails at this step!
+      - run: pip install pre-commit==1.11.2 cfgv==2.0.1 yapf
+      - run: pre-commit install
+      - run: pre-commit run --all-files
+
+      - persist_to_workspace:
+          root: /home/circleci
+          paths:
+            - project
+            - terraform
+            - packer
+
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /home/circleci
+      - checkout
+      - run: echo 'export PATH=$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+      - run:
+          <<: *install_gruntwork_utils
+
+      - run:
+          name: run tests
+          command: |
+            mkdir -p /tmp/logs
+            # run the tests
+            run-go-tests --path test --timeout 60m | tee /tmp/logs/all.log
+          no_output_timeout: 3600s
+      - run:
+          command: terratest_log_parser --testlog /tmp/logs/all.log --outputdir /tmp/logs
+          when: always
+      - store_artifacts:
+          path: /tmp/logs
+      - store_test_results:
+          path: /tmp/logs
+
+  release:
+    <<: *defaults
+    steps:
+      - checkout
+
+      # The weird way you have to set PATH in Circle 2.0
+      - run: echo 'export PATH=$HOME/.local/bin:$HOME/terraform:$HOME/packer:$PATH' >> $BASH_ENV
+
+      # Install gruntwork utilities
+      - run:
+          <<: *install_gruntwork_utils
+
+      - run: ~/project/.circleci/publish-amis.sh "influxdb-ami-ubuntu"
+      - run: ~/project/.circleci/publish-amis.sh "influxdb-ami-amazon-linux"
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build:
+          context:
+            - Gruntwork Admin
+      - test:
+          requires:
+            - build
+          context:
+            - Gruntwork Admin
+      - release:
+          requires:
+            - test
+          context:
+            - Gruntwork Admin
+            - Gruntwork AMI Publishing
+          # Publish new AMIs whenever a new vesion (e.g., v0.3.4) is released
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
