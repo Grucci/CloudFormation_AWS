@@ -1,0 +1,5 @@
+policy_name         = "Test Deny Deployment of Logic Apps Without High Availability"
+policy_display_name = "Test Deny Deployment of Logic Apps Without High Availability"
+policy_description  = "Test Deny Deployment of Logic Apps Without High Availability"
+policy_mode         = "Indexed"
+policy_type         = "Custom"
