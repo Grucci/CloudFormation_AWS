@@ -36,7 +36,7 @@ data "azurerm_policy_definition" "custom_policies_definitions" {
   display_name = var.policies_definitions_list[count.index]
 
   depends_on = [
-    azurerm_policy_definition.logicappdenyha
+    azurerm_policy_definition.logicappdenyha, azurerm_policy_definition.logicappauditha, azurerm_policy_definition.logicappdisableha
   ]
 }
 
@@ -57,20 +57,35 @@ resource "azurerm_policy_definition" "logicappdenyha" {
 }
 
 
-# resource "azurerm_policy_definition" "logicappauditha" {
-#   name         = var.policy_namev2
-#   display_name = var.policy_display_namev2
-#   description  = var.policy_descriptionv2
-#   mode         = var.policy_modev2
-#   policy_type  = var.policy_typev2
+resource "azurerm_policy_definition" "logicappauditha" {
+  name         = var.policy_namev2
+  display_name = var.policy_display_namev2
+  description  = var.policy_descriptionv2
+  mode         = var.policy_modev2
+  policy_type  = var.policy_typev2
 
-#   lifecycle {
-#     ignore_changes = [metadata]
-# }
-#   metadata = file("${path.module}/LogicAppAuditHA/metadata.json")
-#   policy_rule = file("${path.module}/LogicAppAuditHA/policyRule.json")
-#   parameters = file("${path.module}/LogicAppAuditHA/parameters.json")
-# }
+  lifecycle {
+    ignore_changes = [metadata]
+}
+  metadata = file("${path.module}/LogicAppAuditHA/metadata.json")
+  policy_rule = file("${path.module}/LogicAppAuditHA/policyRule.json")
+  parameters = file("${path.module}/LogicAppAuditHA/parameters.json")
+}
+
+resource "azurerm_policy_definition" "logicappdisableha" {
+  name         = var.policy_namev3
+  display_name = var.policy_display_namev3
+  description  = var.policy_descriptionv3
+  mode         = var.policy_modev3
+  policy_type  = var.policy_typev3
+
+  lifecycle {
+    ignore_changes = [metadata]
+}
+  metadata = file("${path.module}/LogicAppDisableHA/metadata.json")
+  policy_rule = file("${path.module}/LogicAppDisableHA/policyRule.json")
+  parameters = file("${path.module}/LogicAppDisableHA/parameters.json")
+}
 
 resource "azurerm_policy_set_definition" "logicappdenyha_polset" {
   name         = "[WAF] Test Initiative"
@@ -86,7 +101,7 @@ resource "azurerm_policy_set_definition" "logicappdenyha_polset" {
   dynamic "policy_definition_reference" {
     for_each = data.azurerm_policy_definition.custom_policies_definitions
     content {
-      policy_definition_id = policy_definition_reference.logicappdenyha.id
+      policy_definition_id = policy_definition_reference.value["id"]
       reference_id         = policy_definition_reference.value["id"]
       # parameters           = var.custom_initiative_parameters["id"]
     }
