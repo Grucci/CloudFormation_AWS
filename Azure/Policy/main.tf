@@ -57,20 +57,20 @@ resource "azurerm_policy_definition" "logicappdenyha" {
 }
 
 
-resource "azurerm_policy_definition" "logicappauditha" {
-  name         = var.policy_namev2
-  display_name = var.policy_display_namev2
-  description  = var.policy_descriptionv2
-  mode         = var.policy_modev2
-  policy_type  = var.policy_typev2
+# resource "azurerm_policy_definition" "logicappauditha" {
+#   name         = var.policy_namev2
+#   display_name = var.policy_display_namev2
+#   description  = var.policy_descriptionv2
+#   mode         = var.policy_modev2
+#   policy_type  = var.policy_typev2
 
-  lifecycle {
-    ignore_changes = [metadata]
-}
-  metadata = file("${path.module}/LogicAppAuditHA/metadata.json")
-  policy_rule = file("${path.module}/LogicAppAuditHA/policyRule.json")
-  parameters = file("${path.module}/LogicAppAuditHA/parameters.json")
-}
+#   lifecycle {
+#     ignore_changes = [metadata]
+# }
+#   metadata = file("${path.module}/LogicAppAuditHA/metadata.json")
+#   policy_rule = file("${path.module}/LogicAppAuditHA/policyRule.json")
+#   parameters = file("${path.module}/LogicAppAuditHA/parameters.json")
+# }
 
 resource "azurerm_policy_set_definition" "logicappdenyha_polset" {
   name         = "[WAF] Test Initiative"
