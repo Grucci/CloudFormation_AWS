@@ -100,9 +100,28 @@ variable "policies_definitions_list"{
     description = "List of policy definitions"
     type = list
     default = [
-        "Deny Logic Apps Without High Availability", "Audit Logic Apps Without High Availability", "Disable Logic Apps Without High Availability"
+        "logicAppDenyHA",
+        "logicAppAuditHA",
+        "logicAppDisableHA"
     ]
 }
+
+// Initiative Category
+variable "policyset_definition_category" {
+    type        = string
+    description = "The category to use for all PolicySet defintions"
+    default     = "WAF"
+}
+
+# variable "policies_definitions_list"{
+#     description = "List of policy definitions"
+#     type = list
+#     default = [
+#         "Deny Logic Apps Without High Availability",
+#         "Audit Logic Apps Without High Availability",
+#         "Disable Logic Apps Without High Availability"
+#     ]
+# }
 
 # variable "custom_policy_definition"{
 #     description = "The policy type determines the nature and purpose of the policy definition"

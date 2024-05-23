@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source = "hashicorp/azurerm"
-      version = "3.104.0"
+      version = "3.104.2"
     }
   }
 }
@@ -92,11 +92,11 @@ resource "azurerm_policy_set_definition" "logicappdenyha_polset" {
   policy_type  = "Custom"
   display_name = "[WAF] Test Initiative"
   description  = "[WAF] Test Initiative"
-#   metadata = <<METADATA
-#     {
-#     "category": "${var.policyset_definition_category}"
-#     }
-# METADATA
+  metadata = <<METADATA
+    {
+    "category": "${var.policyset_definition_category}"
+    }
+METADATA
 
   dynamic "policy_definition_reference" {
     for_each = data.azurerm_policy_definition.custom_policies_definitions

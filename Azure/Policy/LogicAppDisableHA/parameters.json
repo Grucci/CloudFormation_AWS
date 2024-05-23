@@ -8,8 +8,8 @@
         "allowedValues": [
             "Deny",
             "Audit",
-            "auditIfNotExists"
+            "Disabled"
         ],
-        "defaultValue": "auditIfNotExists"
+        "defaultValue": "Disabled"
     }
 }
