@@ -13,24 +13,8 @@ provider "azurerm" {
 
   }
 }
-####
-# data "azurerm_subscription" "subscription"{
-#   subscription_id = "27ef1f07-ab2f-47f7-b7f4-df091235184b"
-# }
 
-# data "azurerm_policy_definition" "logicappdenyha" {
-#   display_name = "Test Deny Deployment of Logic Apps Without High Availability"
-
-#   depends_on = [ azurerm_policy_definition.logicappdenyha ]
-# }
-
-# data "azurerm_policy_definition" "logicappauditha" {
-#   display_name = "Test AUDIT Deployment of Logic Apps Without High Availability"
-
-#   depends_on = [ azurerm_policy_definition.logicappdenyha ]
-# }
-
-// Get the list of Policies
+## Get the list of Policies
 data "azurerm_policy_definition" "custom_policies_definitions" {
   count        = length(var.policies_definitions_list)
   display_name = var.policies_definitions_list[count.index]
@@ -103,36 +87,11 @@ METADATA
     content {
       policy_definition_id = policy_definition_reference.value["id"]
       reference_id         = policy_definition_reference.value["id"]
-      # parameters           = var.custom_initiative_parameters["id"]
+      # parameters           = var.custom_initiative_parameters["id"] (ANALISAR)
     }
   }
 
   depends_on = [
     data.azurerm_policy_definition.custom_policies_definitions
   ]
-
-  # dynamic "policy_definition_reference" {
-  #   for_each = var.policy_list ? [1] : []
-  #   content {
-  #     policy_definition_id = policy_list.id
-  #   }
-    
-  # }
-
-  # policy_definition_reference {
-  #   policy_definition_id = data.azurerm_policy_definition.policy_deny_def_id.id
-  # }
-
-  #   policy_definition_reference {
-  #   policy_definition_id = data.azurerm_policy_definition.policy_audit_def_id.id
-  # }
-
 }
-
-# ### Policy Assignment
-# resource "azurerm_subscription_policy_assignment" "logicappdenyha_assignment" {
-#   name = "[WAF] Test Initiative"
-#   subscription_id = data.azurerm_subscription.subscription.id
-#   policy_definition_id = azurerm_policy_definition.logicappdenyha.id
-#   display_name = "[WAF] Test Initiative"
-# }

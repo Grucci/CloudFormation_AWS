@@ -100,36 +100,20 @@ variable "policies_definitions_list"{
     description = "List of policy definitions"
     type = list
     default = [
-        "logicAppDenyHA",
-        "logicAppAuditHA",
-        "logicAppDisableHA"
+        "Deny Logic Apps Without High Availability",
+        "Audit Logic Apps Without High Availability",
+        "Disable Logic Apps Without High Availability"
     ]
 }
 
-// Initiative Category
+## Initiative Category
 variable "policyset_definition_category" {
     type        = string
     description = "The category to use for all PolicySet defintions"
     default     = "WAF"
 }
 
-# variable "policies_definitions_list"{
-#     description = "List of policy definitions"
-#     type = list
-#     default = [
-#         "Deny Logic Apps Without High Availability",
-#         "Audit Logic Apps Without High Availability",
-#         "Disable Logic Apps Without High Availability"
-#     ]
-# }
-
-# variable "custom_policy_definition"{
-#     description = "The policy type determines the nature and purpose of the policy definition"
-#     type = list(string)
-#     default = ["azurerm_policy_definition.policy_deny_def_id.id", "azurerm_policy_definition.policy_audit_def_id.id"]
-# }   
-
-// Define parameters for the Custom Initiative
+## Define parameters for the Custom Initiative (ANALISAR)
 # variable "custom_initiative_parameters" {
 #     type        = list
 #     description = "List of policy definitions"
@@ -149,11 +133,4 @@ variable "policyset_definition_category" {
 #         }
 #         PARAMETERS    
 #     ]
-# }
-
-# // Initiative Category
-# variable "policyset_definition_category" {
-#     type        = string
-#     description = "The category to use for all PolicySet defintions"
-#     default     = "Custom"
 # }
