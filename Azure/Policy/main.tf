@@ -1,17 +1,18 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
-      version = "3.104.2"
+      source  = "hashicorp/azurerm"
+      version = "3.105.0"
     }
   }
 }
 
 provider "azurerm" {
   skip_provider_registration = true
-  features {
+  features {}
+}
 
-  }
+data "azurerm_subscription" "example" {
 }
 
 ## Get the list of Policies
@@ -22,6 +23,10 @@ data "azurerm_policy_definition" "custom_policies_definitions" {
   depends_on = [
     azurerm_policy_definition.logicappdenyha, azurerm_policy_definition.logicappauditha, azurerm_policy_definition.logicappdisableha
   ]
+}
+
+data "azurerm_policy_set_definition" "custom_policies_set_definitions" {
+  display_name = "[WAF] Test Initiative"
 }
 
 ## Policy Definition
@@ -94,4 +99,10 @@ METADATA
   depends_on = [
     data.azurerm_policy_definition.custom_policies_definitions
   ]
+}
+
+resource "azurerm_subscription_policy_assignment" "wafpolset" {
+  name                 = "teste"
+  policy_definition_id = data.azurerm_policy_set_definition.custom_policies_set_definitions.id
+  subscription_id      = data.azurerm_subscription.example.id
 }
